@@ -1,0 +1,219 @@
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const Movie = require('./models/Movie');  // Adjust this import based on your model location
+const User = require('./models/User');  // Adjust this import based on your model location
+
+dotenv.config();
+
+// Connect to the database
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Database connected successfully');
+  })
+  .catch((err) => {
+    console.log('Database connection error: ', err);
+  });
+
+// Sample movie data
+const movies = [
+    {
+      "title": "Spider-Man: No Way Home",
+      "genre": "Action, Adventure, Sci-Fi",
+      "language": "English",
+      "showtimes": ["11:00 AM", "02:30 PM", "06:30 PM", "09:00 PM"],
+      "seats": {
+        "A1": true,
+        "A2": false,
+        "A3": true,
+        "B1": true,
+        "B2": false,
+        "B3": true
+      },
+      "duration": "148 minutes",
+      "releaseDate": "2021-12-17T00:00:00.000Z",
+      "description": "With Spider-Man's identity now revealed, Peter Parker seeks the help of Doctor Strange to erase the knowledge of his secret identity from the world, but they accidentally open a multiversal rift.",
+      "imageUrl": "https://example.com/spider-man-no-way-home.jpg"
+    },
+    {
+      "title": "The Dark Knight",
+      "genre": "Action, Crime, Drama",
+      "language": "English",
+      "showtimes": ["10:00 AM", "01:00 PM", "04:00 PM", "07:00 PM"],
+      "seats": {
+        "A1": false,
+        "A2": true,
+        "A3": true,
+        "B1": true,
+        "B2": false,
+        "B3": true
+      },
+      "duration": "152 minutes",
+      "releaseDate": "2008-07-18T00:00:00.000Z",
+      "description": "Batman faces a new villain, the Joker, who wants to create chaos and disorder in Gotham City, pushing Batman to his limits.",
+      "imageUrl": "https://example.com/dark-knight.jpg"
+    },
+    {
+      "title": "Inception",
+      "genre": "Action, Adventure, Sci-Fi",
+      "language": "English",
+      "showtimes": ["12:00 PM", "03:30 PM", "07:00 PM", "10:00 PM"],
+      "seats": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "B1": false,
+        "B2": true,
+        "B3": false
+      },
+      "duration": "148 minutes",
+      "releaseDate": "2010-07-16T00:00:00.000Z",
+      "description": "A thief who enters the minds of others to steal secrets from their subconscious is given the task of planting an idea into the mind of a CEO.",
+      "imageUrl": "https://example.com/inception.jpg"
+    },
+    {
+      "title": "Avengers: Endgame",
+      "genre": "Action, Adventure, Drama",
+      "language": "English",
+      "showtimes": ["02:00 PM", "05:30 PM", "08:30 PM", "11:00 PM"],
+      "seats": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "B1": true,
+        "B2": false,
+        "B3": true
+      },
+      "duration": "181 minutes",
+      "releaseDate": "2019-04-26T00:00:00.000Z",
+      "description": "The Avengers must find a way to undo the damage caused by Thanos and restore the universe to its former state.",
+      "imageUrl": "https://example.com/avengers-endgame.jpg"
+    },
+    {
+      "title": "The Matrix",
+      "genre": "Action, Sci-Fi",
+      "language": "English",
+      "showtimes": ["09:00 AM", "12:00 PM", "03:00 PM", "06:00 PM"],
+      "seats": {
+        "A1": true,
+        "A2": false,
+        "A3": true,
+        "B1": false,
+        "B2": true,
+        "B3": false
+      },
+      "duration": "136 minutes",
+      "releaseDate": "1999-03-31T00:00:00.000Z",
+      "description": "A hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.",
+      "imageUrl": "https://example.com/the-matrix.jpg"
+    },
+    {
+      "title": "Titanic",
+      "genre": "Drama, Romance",
+      "language": "English",
+      "showtimes": ["01:00 PM", "04:30 PM", "08:00 PM", "10:30 PM"],
+      "seats": {
+        "A1": false,
+        "A2": true,
+        "A3": true,
+        "B1": false,
+        "B2": true,
+        "B3": true
+      },
+      "duration": "195 minutes",
+      "releaseDate": "1997-12-19T00:00:00.000Z",
+      "description": "A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic.",
+      "imageUrl": "https://example.com/titanic.jpg"
+    },
+    {
+      "title": "Jurassic Park",
+      "genre": "Adventure, Sci-Fi, Thriller",
+      "language": "English",
+      "showtimes": ["10:30 AM", "02:00 PM", "05:30 PM", "09:30 PM"],
+      "seats": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "B1": true,
+        "B2": true,
+        "B3": false
+      },
+      "duration": "127 minutes",
+      "releaseDate": "1993-06-11T00:00:00.000Z",
+      "description": "During a preview tour, a theme park suffers a major power breakdown that allows its cloned dinosaur exhibits to run amok.",
+      "imageUrl": "https://example.com/jurassic-park.jpg"
+    },
+    {
+      "title": "The Lion King",
+      "genre": "Animation, Adventure, Drama",
+      "language": "English",
+      "showtimes": ["11:30 AM", "02:00 PM", "04:30 PM", "07:00 PM"],
+      "seats": {
+        "A1": false,
+        "A2": true,
+        "A3": true,
+        "B1": true,
+        "B2": false,
+        "B3": true
+      },
+      "duration": "88 minutes",
+      "releaseDate": "1994-06-24T00:00:00.000Z",
+      "description": "Lion prince Simba and his father are targeted by his bitter uncle, who wants to ascend the throne himself.",
+      "imageUrl": "https://example.com/the-lion-king.jpg"
+    },
+    {
+      "title": "Star Wars: A New Hope",
+      "genre": "Action, Adventure, Fantasy",
+      "language": "English",
+      "showtimes": ["12:00 PM", "03:00 PM", "06:00 PM", "09:00 PM"],
+      "seats": {
+        "A1": true,
+        "A2": false,
+        "A3": true,
+        "B1": false,
+        "B2": true,
+        "B3": true
+      },
+      "duration": "121 minutes",
+      "releaseDate": "1977-05-25T00:00:00.000Z",
+      "description": "Luke Skywalker joins forces with a smuggler, Chewbacca, and a princess to rescue the galaxy from the evil empire.",
+      "imageUrl": "https://example.com/star-wars-new-hope.jpg"
+    }
+  ];
+
+// Sample user data
+const users = [
+  {
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    password: 'hashedpassword123', // Ensure to hash passwords before saving
+    role: 'user',
+  },
+  // Add more user objects here
+];
+
+// Seed movies
+const seedMovies = async () => {
+  await Movie.deleteMany();  // Clear previous movies
+  await Movie.insertMany(movies);
+  console.log('Movies seeded successfully');
+};
+
+// Seed users
+const seedUsers = async () => {
+  await User.deleteMany();  // Clear previous users
+  await User.insertMany(users);
+  console.log('Users seeded successfully');
+};
+
+// Run seeding functions
+const seedDatabase = async () => {
+  await seedMovies();
+  await seedUsers();
+  mongoose.connection.close();
+  console.log('Database seeding complete');
+};
+
+seedDatabase().catch((err) => {
+  console.error('Error seeding database:', err);
+  mongoose.connection.close();
+});
