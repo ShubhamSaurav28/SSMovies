@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom'; // Import useNavigate
 import axios from 'axios';
 import { FaTicketAlt, FaStar } from 'react-icons/fa'; // Importing icons for better visuals
 
@@ -8,6 +8,7 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -28,6 +29,14 @@ const MovieDetail = () => {
   if (error) return <div className="text-center mt-20">{error}</div>;
   if (!movie) return <div className="text-center mt-20">Movie not found!</div>;
 
+  const handleBookNow = (showtime) => {
+    // Navigate to the booking page with movieId and showtime data
+    navigate(`/book/${movieId}`, { state: { showtime } });
+  };
+  console.log(movie);
+  console.log(movie.movieHall[0])
+
+
   return (
     <div className="container mx-auto p-6 pt-[75px]">
       {/* Movie Banner */}
@@ -42,9 +51,13 @@ const MovieDetail = () => {
             <span className="flex items-center text-yellow-400 text-lg mr-4">
               <FaStar className="mr-1" /> {movie.rating} / 10
             </span>
-            <span className="text-lg">Genre: {movie.genre}</span>
+            <span className="text-lg">
+              <strong>Genre:</strong> {movie.genres.join(', ')}
+            </span>
           </div>
-          <span className="block text-gray-300 text-sm mt-2">{movie.language} | {movie.duration} minutes</span>
+          <span className="block text-gray-300 text-sm mt-2">
+            {new Date(movie.releaseDate).toLocaleDateString()} | {movie.language} | {movie.duration} minutes
+          </span>
         </div>
       </div>
 
@@ -86,39 +99,35 @@ const MovieDetail = () => {
           </div>
         </div>
 
-        {/* Showtime Section */}
-        <div className="lg:w-2/5 lg:pl-8 mt-8 lg:mt-0">
-          <h3 className="text-2xl font-semibold mb-4">Available Showtimes</h3>
-          <div className="space-y-4">
-            {movie.showtimes.map((time, index) => (
-              <div
-                key={index}
-                className={`p-4 border rounded-lg shadow-md flex justify-between items-center ${
-                  time.is_sold_out ? 'bg-gray-200' : 'bg-white'
-                }`}
+        {/* Movie Halls */}
+        <div className="movie-halls mt-8 pl-3">
+        <h3 className="text-2xl font-bold text-gray-800 mb-4">Movie Halls</h3>
+
+        {movie.movieHall && movie.movieHall.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {movie.movieHall.map((hall, index) => (
+              <Link 
+                key={index} 
+                to={`/hall/${hall._id}`} 
+                className="p-4 bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out transform hover:scale-105"
               >
-                <div>
-                  <p className="text-lg font-medium">
-                    {new Date(time.show_time).toLocaleString()}
-                  </p>
-                  <p className="text-gray-600">Hall: {time.hall_name}</p>
+                <div className="flex flex-col items-start">
+                  <h4 className="text-lg font-semibold text-white mb-2">{hall.movieHallName}</h4>
+                  <p className="text-sm text-gray-400 mb-2">{hall.address}</p>
+                  <div className="flex items-center text-gray-300 text-sm">
+                    <span className="mr-1">Capacity:</span>
+                    <span>{hall.seats.length}</span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">
-                    ${time.ticket_price}
-                  </p>
-                  {time.is_sold_out ? (
-                    <span className="text-red-500 text-sm">Sold Out</span>
-                  ) : (
-                    <button className="mt-2 py-1 px-3 bg-indigo-600 text-white rounded-lg flex items-center gap-1 hover:bg-indigo-700">
-                      <FaTicketAlt /> Book Now
-                    </button>
-                  )}
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
-        </div>
+        ) : (
+          <div className="p-4 bg-red-500 text-white rounded-lg">
+            No movie halls available
+          </div>
+        )}
+      </div>
       </div>
     </div>
   );

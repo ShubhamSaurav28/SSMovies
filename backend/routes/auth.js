@@ -72,9 +72,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h', // Token expires in 1 hour
-    });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
     const newUser = {
       email: user.email,

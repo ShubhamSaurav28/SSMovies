@@ -7,6 +7,8 @@ import MoviesPage from './components/MoviesPage';
 import MovieDetail from './components/MovieDetail';
 import Profile from './components/Profile';
 import EditProfile from './components/EditProfile';
+import BookingPage from './components/BookingPage';
+import HallPage from './components/HallPage';
 
 // Dynamically import components
 const Home = React.lazy(() => import('./components/Home'));
@@ -43,6 +45,8 @@ function App() {
                   <Route path="/movies/:movieId" element={<MovieDetail />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/edit-profile" element={<EditProfile />} />
+                  <Route path="/book/:movieId" element={<BookingPage />} />
+                  <Route path="/hall/:hallId" element={<HallPage />} />
                   <Route
                     path="/login"
                     element={

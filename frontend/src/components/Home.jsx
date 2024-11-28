@@ -1,34 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Header from './Header';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
+  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/movies/front').then((res) => setMovies(res.data));
   }, []);
+
+  const handleBookTickets = (movieId) => {
+    // Navigate to MovieDetail page with movieId as a URL parameter
+    navigate(`/movies/${movieId}`);
+  };
 
   return (
     <>
       <div className="bg-gradient-to-b from-indigo-900 via-gray-900 to-black text-white min-h-screen pt-[75px]">
         <div className="container mx-auto px-4 py-8">
           {/* Hero Section */}
-          <div className="relative bg-cover bg-center h-[400px] mb-12 rounded-lg shadow-lg overflow-hidden" 
+          <div
+            className="relative bg-cover bg-center h-[400px] mb-12 rounded-lg shadow-lg overflow-hidden"
             style={{
               backgroundImage: "url('https://source.unsplash.com/1600x900/?cinema')",
-            }}>
+            }}
+          >
             <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center">
               <h1 className="text-5xl font-bold text-white mb-4">Discover Movies You'll Love</h1>
               <p className="text-lg text-gray-300 mb-6">Book tickets for the latest blockbuster hits now!</p>
-              <button className="px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all">
-                Explore Now
-              </button>
+              <a href="/movies">
+                <button className="px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all">
+                  Explore Now
+                </button>
+              </a>
             </div>
           </div>
 
           {/* Movie Grid Section */}
-          <h2 className="text-3xl font-semibold mb-6">Now Showing</h2>
+          <h2 className="text-3xl font-semibold mb-6">Popular Movies</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {movies.map((movie) => (
               <div
@@ -36,13 +46,13 @@ const Home = () => {
                 className="group bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
               >
                 <img
-                  src={movie.imageUrl}
+                  src={movie.movie_image}
                   alt={movie.title}
                   className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
                 />
                 <div className="p-4">
                   <h3 className="text-xl font-bold text-white">{movie.title}</h3>
-                  <p className="text-sm text-gray-400">{movie.genre}</p>
+                  <p className="text-sm text-gray-400">{movie.genres.join(', ')}</p>
                   <p className="text-sm text-gray-500">{movie.language}</p>
                   <div className="mt-4 flex items-center justify-between">
                     <span className="text-yellow-500 flex items-center">
@@ -64,7 +74,7 @@ const Home = () => {
                     </span>
                     <button
                       className="py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none"
-                      onClick={() => alert(`Redirecting to movie details for ${movie.title}`)}
+                      onClick={() => handleBookTickets(movie._id)} // Use navigate here
                     >
                       Book Tickets
                     </button>

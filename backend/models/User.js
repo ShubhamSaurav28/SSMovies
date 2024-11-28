@@ -84,19 +84,15 @@ const userSchema = new mongoose.Schema(
     address: {
       street: {
         type: String,
-        default: 'NA',
       },
       city: {
         type: String,
-        default: 'NA',
       },
       state: {
         type: String,
-        default: 'NA',
       },
       postalCode: {
         type: String,
-        default: 'NA',
       },
     },
   },

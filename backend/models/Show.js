@@ -1,20 +1,48 @@
 const mongoose = require('mongoose');
 
+const seatSchema = new mongoose.Schema({
+  isSeat: {
+    type: Boolean,
+    required: true,
+    default: true,
+  },
+  isAvailable: {
+    type: Boolean,
+    required: true,
+    default: true,
+  },
+  isBooked: {
+    type: Boolean,
+    required: true,
+    default: false,
+  }
+})
+
 const showSchema = new mongoose.Schema({
-  movie_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Movie', required: true },
-  showtimes: [
-    {
-      show_time: { type: Date, required: true },
-      ticket_price: { type: Number, required: true },
-      is_sold_out: { type: Boolean, required: true },
-      seating_capacity: { type: Number, required: true },
-      hall_name: { type: String, required: true }
-    }
-  ],
-  duration: { type: Number, required: true }, // duration in minutes
-  description: { type: String, required: true },
-  rating: { type: Number, required: true },
+  timing: {
+    type: String,
+    required: true,
+  },
+  date: {
+    type: String,
+    required: true,
+  },
+  movieName: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  seating: {
+    type: [[seatSchema]]
+  },
+  movieHall: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'MovieHall'
+  }
 });
 
-module.exports = mongoose.model('Show', showSchema);
-     
+const Show = mongoose.model('Show', showSchema);
+module.exports = Show;

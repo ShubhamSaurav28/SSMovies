@@ -35,14 +35,22 @@ const MoviesPage = () => {
         movie.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
+
     if (selectedGenre) {
-      filtered = filtered.filter((movie) => movie.genre.includes(selectedGenre));
-    }
-    if (selectedYear) {
-      filtered = filtered.filter(
-        (movie) => new Date(movie.releaseDate).getFullYear().toString() === selectedYear
+      filtered = filtered.filter((movie) =>
+        movie.genres.some((genre) =>
+          genre.toLowerCase().includes(selectedGenre.toLowerCase())
+        )
       );
     }
+
+    if (selectedYear) {
+      filtered = filtered.filter(
+        (movie) =>
+          new Date(movie.releaseDate).getFullYear().toString() === selectedYear
+      );
+    }
+
     if (selectedRating) {
       filtered = filtered.filter((movie) => movie.rating >= selectedRating);
     }
@@ -56,13 +64,13 @@ const MoviesPage = () => {
   }, [searchQuery, selectedGenre, selectedYear, selectedRating]);
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen p-6 pt-[75px]">
+    <div className="bg-gray-900 text-white min-h-screen p-6 pt-[85px]">
       <h1 className="text-4xl font-bold text-center mb-8">Explore Movies</h1>
 
       {/* Search and Filter Section */}
       <div className="flex flex-wrap gap-4 mb-8 justify-center">
         {/* Search Bar */}
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md self-end">
           <input
             type="text"
             placeholder="Search for movies..."
@@ -81,11 +89,13 @@ const MoviesPage = () => {
             className="py-2 px-4 border border-gray-700 bg-gray-800 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="">All Genres</option>
-            <option value="Action">Action</option>
-            <option value="Comedy">Comedy</option>
-            <option value="Drama">Drama</option>
-            <option value="Horror">Horror</option>
-            <option value="Romance">Romance</option>
+            {Array.from(
+              new Set(movies.flatMap((movie) => movie.genres))
+            ).map((genre) => (
+              <option key={genre} value={genre}>
+                {genre}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -100,10 +110,12 @@ const MoviesPage = () => {
             <option value="">All Years</option>
             {Array.from(
               new Set(
-                movies.map((movie) => new Date(movie.releaseDate).getFullYear())
+                movies.map((movie) =>
+                  new Date(movie.releaseDate).getFullYear().toString()
+                )
               )
             )
-              .sort((a, b) => b - a) // Sort years in descending order
+              .sort((a, b) => b - a)
               .map((year) => (
                 <option key={year} value={year}>
                   {year}
